@@ -1,0 +1,28 @@
+.navigation ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color: #f1f1f1;
+  }
+  
+  .navigation li {
+    float: left;
+  }
+  
+  .navigation li a,
+  .navigation li button {
+    display: block;
+    color: #333;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+    border: none;
+    background-color: transparent;
+    cursor: pointer;
+  }
+  
+  .navigation li a:hover,
+  .navigation li button:hover {
+    background-color: #ddd;
+  }
