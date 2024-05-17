@@ -3,13 +3,14 @@ import { getAuth } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 
 const firebaseConfig = {
-  apiKey: "AIzaSyB-cse-vnuNr14ivrhEapESB2s4BL_FkZI",
-  authDomain: "safepassvault.firebaseapp.com",
-  projectId: "safepassvault",
-  storageBucket: "safepassvault.appspot.com",
-  messagingSenderId: "312079692617",
-  appId: "1:312079692617:web:84cb6bfe68cf5d4b1b6098",
-  measurementId: "G-RVEE92B3DT"
+  apiKey: "AIzaSyCIMRMTVynf_WSF4kVHQ-dWP7koBo-EDaI",
+  authDomain: "safepassvault-f87da.firebaseapp.com",
+  databaseURL: "https://safepassvault-f87da-default-rtdb.firebaseio.com/",
+  projectId: "safepassvault-f87da",
+  storageBucket: "safepassvault-f87da.appspot.com",
+  messagingSenderId: "1026604914661",
+  appId: "1:1026604914661:web:8fb18d33f6a8d53825810c",
+  measurementId: "G-2031FCWEY9"
 };
 
 const app = initializeApp(firebaseConfig);
