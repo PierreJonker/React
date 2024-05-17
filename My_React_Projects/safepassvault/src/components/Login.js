@@ -1,37 +1,64 @@
 import React, { useState } from 'react';
-import { Link, useHistory } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { auth, firestore } from '../firebase';
 import './Login.css';
 
 function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [emailError, setEmailError] = useState('');
+  const [passwordError, setPasswordError] = useState('');
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
-  const history = useHistory();
+  const navigate = useNavigate();
+
+  const validateForm = () => {
+    let isValid = true;
+
+    if (email.trim() === '') {
+      setEmailError('Email is required');
+      isValid = false;
+    } else if (!/\S+@\S+\.\S+/.test(email)) {
+      setEmailError('Email is invalid');
+      isValid = false;
+    } else {
+      setEmailError('');
+    }
+
+    if (password.trim() === '') {
+      setPasswordError('Password is required');
+      isValid = false;
+    } else {
+      setPasswordError('');
+    }
+
+    return isValid;
+  };
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    setLoading(true);
-    try {
-      await auth.signInWithEmailAndPassword(email, password);
-      const user = auth.currentUser;
-      const signupRequestDoc = await firestore.collection('signupRequests').doc(user.uid).get();
-      if (signupRequestDoc.exists) {
-        const { approved } = signupRequestDoc.data();
-        if (approved) {
-          history.push('/dashboard');
+    if (validateForm()) {
+      setLoading(true);
+      try {
+        await auth.signInWithEmailAndPassword(email, password);
+        const user = auth.currentUser;
+        const signupRequestDoc = await firestore.collection('signupRequests').doc(user.uid).get();
+        if (signupRequestDoc.exists) {
+          const { approved } = signupRequestDoc.data();
+          if (approved) {
+            navigate('/dashboard');
+          } else {
+            navigate('/waiting');
+          }
         } else {
-          history.push('/waiting');
+          navigate('/dashboard');
         }
-      } else {
-        history.push('/dashboard');
+      } catch (error) {
+        console.log('Error logging in:', error);
+        setError('Invalid email or password');
       }
-    } catch (error) {
-      console.log('Error logging in:', error);
-      setError('Invalid email or password');
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   return (
@@ -44,12 +71,14 @@ function Login() {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
         />
+        {emailError && <p className="error">{emailError}</p>}
         <input
           type="password"
           placeholder="Password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
+        {passwordError && <p className="error">{passwordError}</p>}
         {error && <p className="error">{error}</p>}
         <button type="submit" disabled={loading}>
           {loading ? 'Logging in...' : 'Login'}
