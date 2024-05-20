@@ -31,15 +31,16 @@ function Signup() {
     if (validateForm()) {
       setLoading(true);
       try {
-        await addDoc(collection(firestore, 'signupData'), {
+        await addDoc(collection(firestore, 'users'), {
           email: email,
+          approvalStatus: 'pending',
           createdAt: new Date(),
-          // Add any other relevant data fields here
+          // Add any other relevant user data fields
         });
         setEmail('');
         setError(null);
         alert('Signup request submitted! Please wait for admin approval.');
-        navigate('/waiting'); // Redirect to the "Waiting" page
+        navigate('/waiting');
       } catch (error) {
         console.log('Error submitting signup request:', error);
         setError('Failed to submit signup request');

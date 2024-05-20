@@ -49,6 +49,7 @@ function ForgotPassword() {
             placeholder="Email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+            aria-label="Email"
           />
           {emailError && <p className="error">{emailError}</p>}
           {error && <p className="error">{error}</p>}

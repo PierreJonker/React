@@ -7,9 +7,10 @@ function Admin() {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    // Fetch signup requests from Firestore
-    const unsubscribe = firestore.collection('signupRequests')
-      .where('approved', '==', false)
+    // Fetch pending signup requests from Firestore
+    const unsubscribe = firestore
+      .collection('users')
+      .where('approvalStatus', '==', 'pending')
       .onSnapshot((snapshot) => {
         const requests = snapshot.docs.map((doc) => ({
           id: doc.id,
@@ -24,8 +25,8 @@ function Admin() {
   const handleApproveRequest = async (requestId) => {
     setLoading(true);
     try {
-      await firestore.collection('signupRequests').doc(requestId).update({
-        approved: true,
+      await firestore.collection('users').doc(requestId).update({
+        approvalStatus: 'approved',
       });
     } catch (error) {
       console.log('Error approving request:', error);
@@ -33,12 +34,14 @@ function Admin() {
     setLoading(false);
   };
 
-  const handleRemoveRequest = async (requestId) => {
+  const handleRejectRequest = async (requestId) => {
     setLoading(true);
     try {
-      await firestore.collection('signupRequests').doc(requestId).delete();
+      await firestore.collection('users').doc(requestId).update({
+        approvalStatus: 'rejected',
+      });
     } catch (error) {
-      console.log('Error removing request:', error);
+      console.log('Error rejecting request:', error);
     }
     setLoading(false);
   };
@@ -50,13 +53,18 @@ function Admin() {
       {signupRequests.map((request) => (
         <div key={request.id} className="request">
           <p>Email: {request.email}</p>
-          <p>Role: {request.role}</p>
           <div>
-            <button onClick={() => handleApproveRequest(request.id)} disabled={loading}>
+            <button
+              onClick={() => handleApproveRequest(request.id)}
+              disabled={loading}
+            >
               {loading ? 'Approving...' : 'Approve'}
             </button>
-            <button onClick={() => handleRemoveRequest(request.id)} disabled={loading}>
-              {loading ? 'Removing...' : 'Remove'}
+            <button
+              onClick={() => handleRejectRequest(request.id)}
+              disabled={loading}
+            >
+              {loading ? 'Rejecting...' : 'Reject'}
             </button>
           </div>
         </div>

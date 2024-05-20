@@ -1,9 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import { auth, firestore } from '../firebase';
-import CryptoJS from 'crypto-js';
+import crypto from 'crypto';
 import PasswordGenerator from './PasswordGenerator';
-import { handleError } from '../utils/errorHandling';
 import './Dashboard.css';
+
+// Generate a secure encryption key (you can store this in a secure location or use a key management service)
+const encryptionKey = crypto.randomBytes(32).toString('hex');
+
+const encryptPassword = (password) => {
+  const cipher = crypto.createCipher('aes-256-cbc', encryptionKey);
+  let encryptedPassword = cipher.update(password, 'utf8', 'hex');
+  encryptedPassword += cipher.final('hex');
+  return encryptedPassword;
+};
+
+const decryptPassword = (encryptedPassword) => {
+  const decipher = crypto.createDecipher('aes-256-cbc', encryptionKey);
+  let decryptedPassword = decipher.update(encryptedPassword, 'hex', 'utf8');
+  decryptedPassword += decipher.final('utf8');
+  return decryptedPassword;
+};
 
 function Dashboard() {
   const [user, setUser] = useState(null);
@@ -14,6 +30,10 @@ function Dashboard() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
+    fetchUserPasswords();
+  }, []);
+
+  const fetchUserPasswords = () => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
       if (user) {
         setUser(user);
@@ -21,6 +41,7 @@ function Dashboard() {
         const passwordsRef = firestore.collection('passwords');
         const query = passwordsRef.where('userId', '==', user.uid);
         const unsubscribePasswords = query.onSnapshot((snapshot) => {
+          // Map the snapshot data to an array of password objects
           const passwordsData = snapshot.docs.map((doc) => ({
             id: doc.id,
             ...doc.data(),
@@ -28,6 +49,7 @@ function Dashboard() {
           setPasswords(passwordsData);
         });
 
+        // Clean up the listener when the component unmounts
         return () => {
           unsubscribePasswords();
         };
@@ -38,13 +60,13 @@ function Dashboard() {
     });
 
     return () => unsubscribe();
-  }, []);
+  };
 
   const handleAddPassword = async (e) => {
     e.preventDefault();
     try {
       const passwordsRef = firestore.collection('passwords');
-      const encryptedPassword = CryptoJS.AES.encrypt(password, user.uid).toString();
+      const encryptedPassword = encryptPassword(password);
       await passwordsRef.add({
         userId: user.uid,
         website,
@@ -57,7 +79,8 @@ function Dashboard() {
       setPassword('');
       setError(null);
     } catch (error) {
-      handleError(error, setError);
+      console.log('Error adding password:', error);
+      setError('Failed to add password');
     }
   };
 
@@ -75,12 +98,14 @@ function Dashboard() {
           value={website}
           onChange={(e) => setWebsite(e.target.value)}
           required
+          aria-label="Website"
         />
         <input
           type="text"
           placeholder="Username"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
+          aria-label="Username"
         />
         <input
           type="password"
@@ -88,6 +113,7 @@ function Dashboard() {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
+          aria-label="Password"
         />
         <button type="submit">Add Password</button>
       </form>
@@ -98,8 +124,7 @@ function Dashboard() {
           <p>Website: {password.website}</p>
           <p>Username: {password.username}</p>
           <p>
-            Password:{' '}
-            {CryptoJS.AES.decrypt(password.password, user.uid).toString(CryptoJS.enc.Utf8)}
+            Password: {decryptPassword(password.password)}
           </p>
         </div>
       ))}
