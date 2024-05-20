@@ -1,18 +1,19 @@
 import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
-import { getFirestore } from 'firebase/firestore';
+import { getFirestore, collection, addDoc } from 'firebase/firestore';
 
 const firebaseConfig = {
-  apiKey: "AIzaSyCIMRMTVynf_WSF4kVHQ-dWP7koBo-EDaI",
-  authDomain: "safepassvault-f87da.firebaseapp.com",
-  databaseURL: "https://safepassvault-f87da-default-rtdb.firebaseio.com/",
-  projectId: "safepassvault-f87da",
-  storageBucket: "safepassvault-f87da.appspot.com",
-  messagingSenderId: "1026604914661",
-  appId: "1:1026604914661:web:8fb18d33f6a8d53825810c",
-  measurementId: "G-2031FCWEY9"
+  apiKey: "AIzaSyDUV2sDKQ7hbZgfFfiHw1NZQLcyIKm7iuw",
+  authDomain: "safepassvault-e5d29.firebaseapp.com",
+  projectId: "safepassvault-e5d29",
+  storageBucket: "safepassvault-e5d29.appspot.com",
+  messagingSenderId: "820250180754",
+  appId: "1:820250180754:web:3efbfd761f350cc953ba4b",
+  measurementId: "G-F9D4R3HB94"
 };
 
 const app = initializeApp(firebaseConfig);
-export const auth = getAuth(app);
-export const firestore = getFirestore(app);
+const auth = getAuth(app);
+const firestore = getFirestore(app);
+
+export { auth, firestore, collection, addDoc };

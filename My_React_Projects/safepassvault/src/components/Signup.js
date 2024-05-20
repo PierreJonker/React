@@ -1,19 +1,13 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { auth, firestore } from '../firebase';
-import zxcvbn from 'zxcvbn';
+import { firestore, collection, addDoc } from '../firebase';
 import './Signup.css';
 
 function Signup() {
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [role, setRole] = useState('user');
   const [emailError, setEmailError] = useState('');
-  const [passwordError, setPasswordError] = useState('');
-  const [passwordStrength, setPasswordStrength] = useState(null);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
 
   const validateForm = () => {
@@ -29,34 +23,26 @@ function Signup() {
       setEmailError('');
     }
 
-    const passwordResult = zxcvbn(password);
-    if (passwordResult.score < 3) {
-      setPasswordError('Password is too weak');
-      isValid = false;
-    } else {
-      setPasswordError('');
-    }
-
-    setPasswordStrength(passwordResult.score);
-
     return isValid;
   };
 
-  const handleSignup = async (e) => {
+  const handleSignupRequest = async (e) => {
     e.preventDefault();
     if (validateForm()) {
       setLoading(true);
       try {
-        const { user } = await auth.createUserWithEmailAndPassword(email, password);
-        await firestore.collection('signupRequests').doc(user.uid).set({
-          email: user.email,
-          role,
-          approved: false,
+        await addDoc(collection(firestore, 'signupData'), {
+          email: email,
+          createdAt: new Date(),
+          // Add any other relevant data fields here
         });
-        navigate('/waiting');
+        setEmail('');
+        setError(null);
+        alert('Signup request submitted! Please wait for admin approval.');
+        navigate('/waiting'); // Redirect to the "Waiting" page
       } catch (error) {
-        console.log('Error signing up:', error);
-        setError('Failed to sign up');
+        console.log('Error submitting signup request:', error);
+        setError('Failed to submit signup request');
       }
       setLoading(false);
     }
@@ -64,8 +50,8 @@ function Signup() {
 
   return (
     <div className="signup">
-      <h2>Sign Up</h2>
-      <form onSubmit={handleSignup}>
+      <h2>Request Signup</h2>
+      <form onSubmit={handleSignupRequest}>
         <input
           type="email"
           placeholder="Email"
@@ -73,51 +59,9 @@ function Signup() {
           onChange={(e) => setEmail(e.target.value)}
         />
         {emailError && <p className="error">{emailError}</p>}
-        <div className="password-input">
-          <input
-            type={showPassword ? 'text' : 'password'}
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-          <button
-            type="button"
-            className="toggle-password"
-            onClick={() => setShowPassword(!showPassword)}
-          >
-            {showPassword ? 'Hide' : 'Show'}
-          </button>
-        </div>
-        {passwordError && <p className="error">{passwordError}</p>}
-        {passwordStrength !== null && (
-          <div className="password-strength">
-            <progress value={passwordStrength} max="4" />
-            <p>Password Strength: {passwordStrength}/4</p>
-          </div>
-        )}
-        <div>
-          <label>
-            <input
-              type="radio"
-              value="user"
-              checked={role === 'user'}
-              onChange={() => setRole('user')}
-            />
-            User
-          </label>
-          <label>
-            <input
-              type="radio"
-              value="admin"
-              checked={role === 'admin'}
-              onChange={() => setRole('admin')}
-            />
-            Admin
-          </label>
-        </div>
         {error && <p className="error">{error}</p>}
         <button type="submit" disabled={loading}>
-          {loading ? 'Signing up...' : 'Sign Up'}
+          {loading ? 'Submitting...' : 'Submit Signup Request'}
         </button>
       </form>
       <p>

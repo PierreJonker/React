@@ -1,32 +1,36 @@
 import React, { useState, useEffect } from 'react';
 import { auth, firestore } from '../firebase';
 import CryptoJS from 'crypto-js';
+import PasswordGenerator from './PasswordGenerator';
+import { handleError } from '../utils/errorHandling';
 import './Dashboard.css';
 
 function Dashboard() {
   const [user, setUser] = useState(null);
   const [passwords, setPasswords] = useState([]);
   const [website, setWebsite] = useState('');
-  const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
       if (user) {
         setUser(user);
         // Fetch the user's stored passwords from Firestore
-        firestore
-          .collection('passwords')
-          .where('userId', '==', user.uid)
-          .onSnapshot((snapshot) => {
-            const passwordData = snapshot.docs.map((doc) => ({
-              id: doc.id,
-              ...doc.data(),
-            }));
-            setPasswords(passwordData);
-          });
+        const passwordsRef = firestore.collection('passwords');
+        const query = passwordsRef.where('userId', '==', user.uid);
+        const unsubscribePasswords = query.onSnapshot((snapshot) => {
+          const passwordsData = snapshot.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+          }));
+          setPasswords(passwordsData);
+        });
+
+        return () => {
+          unsubscribePasswords();
+        };
       } else {
         setUser(null);
         setPasswords([]);
@@ -38,78 +42,69 @@ function Dashboard() {
 
   const handleAddPassword = async (e) => {
     e.preventDefault();
-    setLoading(true);
     try {
+      const passwordsRef = firestore.collection('passwords');
       const encryptedPassword = CryptoJS.AES.encrypt(password, user.uid).toString();
-      await firestore.collection('passwords').add({
+      await passwordsRef.add({
         userId: user.uid,
         website,
-        email,
+        username,
         password: encryptedPassword,
+        createdAt: new Date(),
       });
       setWebsite('');
-      setEmail('');
+      setUsername('');
       setPassword('');
+      setError(null);
     } catch (error) {
-      console.log('Error adding password:', error);
-      setError('Failed to add password');
-    }
-    setLoading(false);
-  };
-
-  const handleLogout = async () => {
-    try {
-      await auth.signOut();
-      // Redirect to the home page after logout
-    } catch (error) {
-      console.log('Error logging out:', error);
+      handleError(error, setError);
     }
   };
-
-  if (!user) {
-    return <div>Loading...</div>;
-  }
 
   return (
     <div className="dashboard">
       <h2>Dashboard</h2>
-      <p>Welcome, {user.email}!</p>
-      <h3>Stored Passwords</h3>
-      {passwords.map((password) => (
-        <div key={password.id}>
-          <p>Website: {password.website}</p>
-          <p>Email: {password.email}</p>
-          <p>
-            Password: {CryptoJS.AES.decrypt(password.password, user.uid).toString(CryptoJS.enc.Utf8)}
-          </p>
-        </div>
-      ))}
+      <p>Welcome, {user && user.email}!</p>
+
       <h3>Add New Password</h3>
+      {error && <p className="error">{error}</p>}
       <form onSubmit={handleAddPassword}>
         <input
           type="text"
           placeholder="Website"
           value={website}
           onChange={(e) => setWebsite(e.target.value)}
+          required
         />
         <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          type="text"
+          placeholder="Username"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
         />
         <input
           type="password"
           placeholder="Password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
+          required
         />
-        {error && <p className="error">{error}</p>}
-        <button type="submit" disabled={loading}>
-          {loading ? 'Adding...' : 'Add Password'}
-        </button>
+        <button type="submit">Add Password</button>
       </form>
-      <button onClick={handleLogout}>Logout</button>
+
+      <h3>Stored Passwords</h3>
+      {passwords.map((password) => (
+        <div key={password.id}>
+          <p>Website: {password.website}</p>
+          <p>Username: {password.username}</p>
+          <p>
+            Password:{' '}
+            {CryptoJS.AES.decrypt(password.password, user.uid).toString(CryptoJS.enc.Utf8)}
+          </p>
+        </div>
+      ))}
+
+      <PasswordGenerator userId={user && user.uid} />
     </div>
   );
 }

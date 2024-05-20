@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import { doc, getDoc } from 'firebase/firestore';
 import { auth, firestore } from '../firebase';
 import './Login.css';
 
@@ -40,18 +42,20 @@ function Login() {
     if (validateForm()) {
       setLoading(true);
       try {
-        await auth.signInWithEmailAndPassword(email, password);
-        const user = auth.currentUser;
-        const signupRequestDoc = await firestore.collection('signupRequests').doc(user.uid).get();
-        if (signupRequestDoc.exists) {
-          const { approved } = signupRequestDoc.data();
-          if (approved) {
-            navigate('/dashboard');
+        const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
+
+        const userDoc = await getDoc(doc(firestore, 'users', user.uid));
+        if (userDoc.exists()) {
+          const userData = userDoc.data();
+
+          if (userData.role === 'admin') {
+            navigate('/admin');
           } else {
-            navigate('/waiting');
+            navigate('/dashboard');
           }
         } else {
-          navigate('/dashboard');
+          throw new Error('User document not found');
         }
       } catch (error) {
         console.log('Error logging in:', error);
