@@ -1,24 +1,17 @@
 import React from 'react';
-import { Route, Navigate } from 'react-router-dom';
+import { Navigate, Outlet } from 'react-router-dom';
 import { auth } from '../firebase';
 
-function PrivateRoute({ component: Component, roles, ...rest }) {
-  return (
-    <Route
-      {...rest}
-      element={
-        auth.currentUser ? (
-          roles && !roles.includes(auth.currentUser.role) ? (
-            <Navigate to="/unauthorized" />
-          ) : (
-            <Component />
-          )
-        ) : (
-          <Navigate to="/login" />
-        )
-      }
-    />
-  );
+function PrivateRoute({ roles }) {
+  if (!auth.currentUser) {
+    return <Navigate to="/login" />;
+  }
+
+  if (roles && !roles.includes(auth.currentUser.role)) {
+    return <Navigate to="/unauthorized" />;
+  }
+
+  return <Outlet />;
 }
 
 export default PrivateRoute;

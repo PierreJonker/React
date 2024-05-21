@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { firestore } from '../firebase';
+import { firestore } from '../firebase'; // Import firestore from firebase.js
 import './Admin.css';
 
 function Admin() {
@@ -7,7 +7,6 @@ function Admin() {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    // Fetch pending signup requests from Firestore
     const unsubscribe = firestore
       .collection('users')
       .where('approvalStatus', '==', 'pending')

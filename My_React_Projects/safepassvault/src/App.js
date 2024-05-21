@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Home from './components/Home';
 import Login from './components/Login';
 import Signup from './components/Signup';
@@ -18,12 +18,16 @@ function App() {
       <div className="app">
         <Navigation />
         <Routes>
-          <Route exact path="/" element={<Home />} />
+          <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
-          <Route path="/dashboard" element={<PrivateRoute component={Dashboard} />} />
-          <Route path="/admin" element={<PrivateRoute component={Admin} roles={['admin']} />} />
-          <Route path="/profile" element={<PrivateRoute component={Profile} />} />
+          <Route element={<PrivateRoute />}>
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/profile" element={<Profile />} />
+          </Route>
+          <Route element={<PrivateRoute roles={['admin']} />}>
+            <Route path="/admin" element={<Admin />} />
+          </Route>
           <Route path="/waiting" element={<Waiting />} />
           <Route path="/unauthorized" element={<Unauthorized />} />
         </Routes>

@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { signInWithEmailAndPassword } from 'firebase/auth';
-import { doc, getDoc } from 'firebase/firestore';
-import { auth, firestore } from '../firebase';
+import { signInWithEmailAndPassword } from 'firebase/auth'; // Import signInWithEmailAndPassword from firebase/auth
+import { doc, getDoc, addDoc, collection } from 'firebase/firestore';
+import { auth, firestore } from '../firebase'; // Import auth and firestore from ../firebase
 import './Login.css';
 
 function Login() {
@@ -55,7 +55,15 @@ function Login() {
             navigate('/dashboard');
           }
         } else {
-          throw new Error('User document not found');
+          // If the user document doesn't exist, create a new one
+          await addDoc(collection(firestore, 'users'), {
+            email: user.email,
+            approvalStatus: 'approved', // Set approvalStatus to 'approved' for existing users
+            createdAt: new Date(),
+            uid: user.uid,
+            // Add any other relevant user data fields
+          });
+          navigate('/dashboard'); // Redirect to the dashboard for new users
         }
       } catch (error) {
         console.log('Error logging in:', error);

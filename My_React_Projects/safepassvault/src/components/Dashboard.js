@@ -30,29 +30,10 @@ function Dashboard() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    fetchUserPasswords();
-  }, []);
-
-  const fetchUserPasswords = () => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
       if (user) {
         setUser(user);
-        // Fetch the user's stored passwords from Firestore
-        const passwordsRef = firestore.collection('passwords');
-        const query = passwordsRef.where('userId', '==', user.uid);
-        const unsubscribePasswords = query.onSnapshot((snapshot) => {
-          // Map the snapshot data to an array of password objects
-          const passwordsData = snapshot.docs.map((doc) => ({
-            id: doc.id,
-            ...doc.data(),
-          }));
-          setPasswords(passwordsData);
-        });
-
-        // Clean up the listener when the component unmounts
-        return () => {
-          unsubscribePasswords();
-        };
+        fetchUserPasswords(user.uid);
       } else {
         setUser(null);
         setPasswords([]);
@@ -60,6 +41,21 @@ function Dashboard() {
     });
 
     return () => unsubscribe();
+  }, []);
+
+  const fetchUserPasswords = async (userId) => {
+    try {
+      const passwordsRef = firestore.collection('passwords');
+      const query = passwordsRef.where('userId', '==', userId);
+      const snapshot = await query.get();
+      const passwordsData = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setPasswords(passwordsData);
+    } catch (error) {
+      console.log('Error fetching passwords:', error);
+    }
   };
 
   const handleAddPassword = async (e) => {
@@ -123,9 +119,7 @@ function Dashboard() {
         <div key={password.id}>
           <p>Website: {password.website}</p>
           <p>Username: {password.username}</p>
-          <p>
-            Password: {decryptPassword(password.password)}
-          </p>
+          <p>Password: {decryptPassword(password.password)}</p>
         </div>
       ))}
 

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { auth, firestore } from '../firebase';
+import { auth } from '../firebase';
 import './Profile.css';
 
 function Profile() {
@@ -7,18 +7,19 @@ function Profile() {
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
-      if (user) {
-        setUser(user);
-      } else {
-        setUser(null);
-      }
+      setUser(user);
     });
 
     return () => unsubscribe();
   }, []);
 
   if (!user) {
-    return <div>Loading...</div>;
+    return (
+      <div className="profile">
+        <h2>User Profile</h2>
+        <p>Please log in to view your profile.</p>
+      </div>
+    );
   }
 
   return (

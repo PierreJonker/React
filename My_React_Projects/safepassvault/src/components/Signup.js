@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { firestore, collection, addDoc } from '../firebase';
+import { auth, createUserWithEmailAndPassword } from '../firebase'; // Import auth and createUserWithEmailAndPassword
+import { getFirestore, collection, addDoc } from 'firebase/firestore'; // Import getFirestore, collection, and addDoc
 import './Signup.css';
 
 function Signup() {
@@ -31,12 +32,18 @@ function Signup() {
     if (validateForm()) {
       setLoading(true);
       try {
-        await addDoc(collection(firestore, 'users'), {
+        // Create a new user document in Firestore
+        const userCredential = await createUserWithEmailAndPassword(auth, email, 'tempPassword');
+        const user = userCredential.user;
+        const db = getFirestore(); // Get Firestore instance
+        await addDoc(collection(db, 'users'), {
           email: email,
           approvalStatus: 'pending',
           createdAt: new Date(),
+          uid: user.uid,
           // Add any other relevant user data fields
         });
+
         setEmail('');
         setError(null);
         alert('Signup request submitted! Please wait for admin approval.');
