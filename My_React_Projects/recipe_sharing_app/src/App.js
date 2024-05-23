@@ -9,8 +9,10 @@ import Login from './components/Login';
 import Register from './components/Register';
 import Profile from './components/Profile';
 import PrivateRecipes from './components/PrivateRecipes';
-import PrivateRoute from './components/PrivateRoute';
 import DraftRecipes from './components/DraftRecipes';
+import Home from './components/Home';
+import PrivateRoute from './components/PrivateRoute';
+import Footer from './components/Footer';
 import { Container } from 'react-bootstrap';
 import './App.css';
 
@@ -18,9 +20,9 @@ function App() {
   return (
     <Router>
       <Header />
-      <Container>
+      <Container className="flex-grow-1">
         <Routes>
-          <Route path="/" element={<PrivateRoute><RecipeList type="public" /></PrivateRoute>} />
+          <Route path="/" element={<Home />} />
           <Route path="/recipes" element={<PrivateRoute><RecipeList type="public" /></PrivateRoute>} />
           <Route path="/recipes/:id" element={<PrivateRoute><RecipeDetail /></PrivateRoute>} />
           <Route path="/add-recipe" element={<PrivateRoute><RecipeForm /></PrivateRoute>} />
@@ -32,6 +34,7 @@ function App() {
           <Route path="/draft-recipes" element={<PrivateRoute><DraftRecipes /></PrivateRoute>} />
         </Routes>
       </Container>
+      <Footer />
     </Router>
   );
 }

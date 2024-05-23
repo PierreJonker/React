@@ -1,11 +1,12 @@
 // src/components/Header.js
 import React, { useEffect, useState } from 'react';
 import { Navbar, Nav } from 'react-bootstrap';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { getAuth, onAuthStateChanged, signOut } from 'firebase/auth';
 
 const Header = () => {
   const [user, setUser] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const auth = getAuth();
@@ -18,7 +19,9 @@ const Header = () => {
 
   const handleLogout = () => {
     const auth = getAuth();
-    signOut(auth);
+    signOut(auth).then(() => {
+      navigate('/');
+    });
   };
 
   return (
@@ -27,6 +30,7 @@ const Header = () => {
       <Navbar.Toggle aria-controls="basic-navbar-nav" />
       <Navbar.Collapse id="basic-navbar-nav">
         <Nav className="mr-auto">
+          <Nav.Link as={Link} to="/">Home</Nav.Link>
           {user && <Nav.Link as={Link} to="/recipes">Recipes</Nav.Link>}
           {user && <Nav.Link as={Link} to="/add-recipe">Add Recipe</Nav.Link>}
           {user && <Nav.Link as={Link} to="/private-recipes">Private Recipes</Nav.Link>}
