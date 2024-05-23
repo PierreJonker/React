@@ -1,6 +1,5 @@
-// src/components/Login.js
 import React, { useState } from 'react';
-import { Form, Button, Container } from 'react-bootstrap';
+import { Form, Button, Container, Alert } from 'react-bootstrap';
 import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
 import { useNavigate } from 'react-router-dom';
 import { app } from '../firebase';
@@ -8,6 +7,8 @@ import { app } from '../firebase';
 function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
@@ -15,16 +16,30 @@ function Login() {
     const auth = getAuth(app);
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      navigate('/'); // Redirect to homepage after login
+      setSuccess('Login successful!');
+      setError('');
+      setTimeout(() => {
+        navigate('/');
+      }, 2000);
     } catch (error) {
-      console.error('Error logging in:', error);
-      alert('Error logging in: ' + error.message);
+      let errorMessage;
+      if (error.code === 'auth/wrong-password') {
+        errorMessage = 'Incorrect password. Please try again.';
+      } else if (error.code === 'auth/user-not-found') {
+        errorMessage = 'No user found with this email. Please try again.';
+      } else {
+        errorMessage = 'Error logging in. Please try again later.';
+      }
+      setError(errorMessage);
+      setSuccess('');
     }
   };
 
   return (
     <Container>
       <h2>Login</h2>
+      {error && <Alert variant="danger">{error}</Alert>}
+      {success && <Alert variant="success">{success}</Alert>}
       <Form onSubmit={handleLogin}>
         <Form.Group controlId="formBasicEmail">
           <Form.Label>Email address</Form.Label>

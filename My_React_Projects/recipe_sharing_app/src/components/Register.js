@@ -1,6 +1,5 @@
-// src/components/Register.js
 import React, { useState } from 'react';
-import { Form, Button, Container } from 'react-bootstrap';
+import { Form, Button, Container, Alert } from 'react-bootstrap';
 import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth';
 import { getFirestore, doc, setDoc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
@@ -10,6 +9,8 @@ function Register() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [username, setUsername] = useState('');
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
   const navigate = useNavigate();
 
   const handleRegister = async (e) => {
@@ -24,15 +25,22 @@ function Register() {
         username: username,
         createdAt: new Date()
       });
-      navigate('/'); // Redirect to homepage after registration
+      setSuccess('Your account was created!');
+      setError('');
+      setTimeout(() => {
+        navigate('/login');
+      }, 2000);
     } catch (error) {
-      console.error('Error registering:', error);
+      setError('Error registering. Please try again. If the problem persists, contact an admin.');
+      setSuccess('');
     }
   };
 
   return (
     <Container>
       <h2>Register</h2>
+      {error && <Alert variant="danger">{error}</Alert>}
+      {success && <Alert variant="success">{success}</Alert>}
       <Form onSubmit={handleRegister}>
         <Form.Group controlId="formBasicUsername">
           <Form.Label>Username</Form.Label>
