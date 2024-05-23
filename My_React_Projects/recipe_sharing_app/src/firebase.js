@@ -1,7 +1,9 @@
+// src/firebase.js
 import { initializeApp } from 'firebase/app';
 import { getFirestore } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 
+// Your Firebase configuration
 const firebaseConfig = {
   apiKey: "AIzaSyAbReYlG5kUcEqqq8gA0CCI8K6MMM-i2c4",
   authDomain: "recipesharingapp-1be92.firebaseapp.com",
@@ -12,8 +14,9 @@ const firebaseConfig = {
   measurementId: "G-9T99KRPWDW"
 };
 
+// Initialize Firebase
 const app = initializeApp(firebaseConfig);
-const firestore = getFirestore(app);
+const db = getFirestore(app);
 const auth = getAuth(app);
 
-export { app, firestore, auth };
+export { app, db, auth };
