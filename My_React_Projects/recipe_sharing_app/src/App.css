@@ -1,0 +1,65 @@
+/* src/App.css */
+
+body {
+  font-family: Arial, sans-serif;
+  background-image: url('https://images.unsplash.com/photo-1506354666786-959d6d497f1a?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80'); /* Example background image */
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  color: #fff;
+}
+
+.container {
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 8px;
+  padding: 20px;
+  margin-top: 20px;
+}
+
+h2 {
+  margin-top: 20px;
+  color: #333;
+}
+
+.navbar {
+  background-color: #343a40 !important;
+}
+
+.nav-link, .navbar-brand {
+  color: #ff6f61 !important;
+}
+
+.nav-link:hover, .navbar-brand:hover {
+  color: #ffc107 !important;
+}
+
+.form-control {
+  border-radius: 4px;
+}
+
+.btn-primary {
+  background-color: #ff6f61;
+  border-color: #ff6f61;
+}
+
+.btn-primary:hover {
+  background-color: #ff3d47;
+  border-color: #ff3d47;
+}
+
+.recipe-card {
+  background: #fff;
+  color: #333;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.recipe-card h3 {
+  color: #ff6f61;
+}
+
+.recipe-card p {
+  color: #666;
+}
