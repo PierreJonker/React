@@ -74,7 +74,7 @@ const RecipeForm = () => {
       } else {
         await setDoc(doc(firestore, 'recipes', `${new Date().getTime()}-${user.uid}`), recipeData);
       }
-      navigate('/draft-recipes');
+      navigate(status === 'draft' ? '/draft-recipes' : '/recipes');
     } catch (error) {
       console.error('Error saving recipe:', error);
     } finally {
