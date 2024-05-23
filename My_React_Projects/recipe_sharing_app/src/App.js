@@ -1,4 +1,3 @@
-// src/App.js
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Header from './components/Header';
@@ -12,6 +11,7 @@ import PrivateRecipes from './components/PrivateRecipes';
 import DraftRecipes from './components/DraftRecipes';
 import Home from './components/Home';
 import PrivateRoute from './components/PrivateRoute';
+import Admin from './components/Admin'; // Ensure this matches the file name
 import Footer from './components/Footer';
 import { Container } from 'react-bootstrap';
 import './App.css';
@@ -32,6 +32,7 @@ function App() {
           <Route path="/profile" element={<PrivateRoute><Profile /></PrivateRoute>} />
           <Route path="/private-recipes" element={<PrivateRoute><PrivateRecipes /></PrivateRoute>} />
           <Route path="/draft-recipes" element={<PrivateRoute><DraftRecipes /></PrivateRoute>} />
+          <Route path="/admin" element={<PrivateRoute><Admin /></PrivateRoute>} />
         </Routes>
       </Container>
       <Footer />

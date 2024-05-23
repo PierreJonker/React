@@ -23,7 +23,8 @@ function Register() {
       await setDoc(doc(firestore, 'users', user.uid), {
         email: user.email,
         username: username,
-        createdAt: new Date()
+        createdAt: new Date(),
+        admin: false // default value
       });
       setSuccess('Your account was created!');
       setError('');
