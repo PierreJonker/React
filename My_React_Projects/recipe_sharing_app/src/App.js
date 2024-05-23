@@ -10,6 +10,7 @@ import Register from './components/Register';
 import Profile from './components/Profile';
 import PrivateRecipes from './components/PrivateRecipes';
 import PrivateRoute from './components/PrivateRoute';
+import DraftRecipes from './components/DraftRecipes';
 import { Container } from 'react-bootstrap';
 import './App.css';
 
@@ -28,7 +29,7 @@ function App() {
           <Route path="/register" element={<Register />} />
           <Route path="/profile" element={<PrivateRoute><Profile /></PrivateRoute>} />
           <Route path="/private-recipes" element={<PrivateRoute><PrivateRecipes /></PrivateRoute>} />
-          <Route path="/draft-recipes" element={<PrivateRoute><RecipeList type="draft" /></PrivateRoute>} />
+          <Route path="/draft-recipes" element={<PrivateRoute><DraftRecipes /></PrivateRoute>} />
         </Routes>
       </Container>
     </Router>
