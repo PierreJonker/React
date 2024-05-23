@@ -1,3 +1,4 @@
+// src/App.js
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Header from './components/Header';
@@ -12,6 +13,7 @@ import DraftRecipes from './components/DraftRecipes';
 import Home from './components/Home';
 import PrivateRoute from './components/PrivateRoute';
 import Admin from './components/Admin';
+import Support from './components/Support';
 import Footer from './components/Footer';
 import { Container } from 'react-bootstrap';
 import './App.css';
@@ -23,6 +25,7 @@ function App() {
       <Container className="flex-grow-1">
         <Routes>
           <Route path="/" element={<Home />} />
+          <Route path="/support" element={<Support />} />
           <Route path="/recipes" element={<PrivateRoute><RecipeList type="public" /></PrivateRoute>} />
           <Route path="/recipes/:id" element={<PrivateRoute><RecipeDetail /></PrivateRoute>} />
           <Route path="/add-recipe" element={<PrivateRoute><RecipeForm /></PrivateRoute>} />

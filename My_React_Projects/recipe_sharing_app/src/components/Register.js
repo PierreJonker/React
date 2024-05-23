@@ -1,3 +1,4 @@
+// src/components/Register.js
 import React, { useState } from 'react';
 import { Form, Button, Container, Alert } from 'react-bootstrap';
 import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth';
@@ -9,6 +10,8 @@ function Register() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [username, setUsername] = useState('');
+  const [question, setQuestion] = useState('');
+  const [answer, setAnswer] = useState('');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const navigate = useNavigate();
@@ -24,7 +27,9 @@ function Register() {
         email: user.email,
         username: username,
         createdAt: new Date(),
-        admin: false // default value
+        admin: false, // default value
+        securityQuestion: question,
+        securityAnswer: answer,
       });
       setSuccess('Your account was created!');
       setError('');
@@ -32,7 +37,7 @@ function Register() {
         navigate('/login');
       }, 2000);
     } catch (error) {
-      setError('Error registering. Please try again. If the problem persists, contact an admin.');
+      setError('Error registering. Please try again.');
       setSuccess('');
     }
   };
@@ -68,6 +73,24 @@ function Register() {
             placeholder="Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+          />
+        </Form.Group>
+        <Form.Group controlId="formSecurityQuestion">
+          <Form.Label>Security Question</Form.Label>
+          <Form.Control
+            type="text"
+            placeholder="Enter a security question"
+            value={question}
+            onChange={(e) => setQuestion(e.target.value)}
+          />
+        </Form.Group>
+        <Form.Group controlId="formSecurityAnswer">
+          <Form.Label>Security Answer</Form.Label>
+          <Form.Control
+            type="text"
+            placeholder="Enter the answer to your security question"
+            value={answer}
+            onChange={(e) => setAnswer(e.target.value)}
           />
         </Form.Group>
         <Button variant="primary" type="submit">
