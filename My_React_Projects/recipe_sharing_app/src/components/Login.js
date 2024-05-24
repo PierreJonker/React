@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Form, Button, Container, Alert } from 'react-bootstrap';
 import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { app } from '../firebase';
 
 function Login() {
@@ -63,6 +63,9 @@ function Login() {
           Login
         </Button>
       </Form>
+      <div className="mt-3">
+        <Link to="/forgot-password">Forgot Password?</Link>
+      </div>
     </Container>
   );
 }

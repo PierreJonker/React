@@ -98,10 +98,34 @@ const Admin = () => {
 
   const handleReply = async () => {
     if (currentTicket && reply) {
-      const firestore = getFirestore();
-      await updateDoc(doc(firestore, 'supportTickets', currentTicket.id), { reply });
-      setReply('');
-      setShowTicketModal(false);
+      const response = await axios.post(`http://localhost:5000/supportTicket/${currentTicket.id}/respond`, { reply });
+      if (response.status === 200) {
+        const updatedTickets = supportTickets.map(ticket =>
+          ticket.id === currentTicket.id ? { ...ticket, reply } : ticket
+        );
+        setSupportTickets(updatedTickets);
+        setReply('');
+        setShowTicketModal(false);
+        alert('Reply sent successfully');
+      } else {
+        alert('Error sending reply');
+      }
+    }
+  };
+
+  const handleDeleteTicket = async (ticketId) => {
+    try {
+      const response = await axios.delete(`http://localhost:5000/supportTicket/${ticketId}`);
+      if (response.status === 200) {
+        setSupportTickets(supportTickets.filter(ticket => ticket.id !== ticketId));
+        alert('Support ticket deleted successfully');
+      } else {
+        console.error('Error deleting support ticket:', response.data);
+        alert('Error deleting support ticket');
+      }
+    } catch (error) {
+      console.error('Error deleting support ticket:', error);
+      alert('Error deleting support ticket');
     }
   };
 
@@ -178,6 +202,7 @@ const Admin = () => {
               <td>{ticket.message}</td>
               <td>
                 <Button variant="primary" onClick={() => handleViewTicket(ticket)}>View</Button>
+                <Button variant="danger" onClick={() => handleDeleteTicket(ticket.id)}>Delete</Button>
               </td>
             </tr>
           ))}
@@ -215,6 +240,11 @@ const Admin = () => {
               <p><strong>Email:</strong> {currentTicket.email}</p>
               <p><strong>Subject:</strong> {currentTicket.subject}</p>
               <p><strong>Message:</strong> {currentTicket.message}</p>
+              {currentTicket.reply && (
+                <>
+                  <p><strong>Admin Reply:</strong> {currentTicket.reply}</p>
+                </>
+              )}
               <Form.Group controlId="formReply">
                 <Form.Label>Reply</Form.Label>
                 <Form.Control

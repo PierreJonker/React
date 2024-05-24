@@ -14,6 +14,7 @@ import Home from './components/Home';
 import PrivateRoute from './components/PrivateRoute';
 import Admin from './components/Admin';
 import Support from './components/Support';
+import ForgotPassword from './components/ForgotPassword';
 import Footer from './components/Footer';
 import { Container } from 'react-bootstrap';
 import './App.css';
@@ -26,6 +27,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/support" element={<Support />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/recipes" element={<PrivateRoute><RecipeList type="public" /></PrivateRoute>} />
           <Route path="/recipes/:id" element={<PrivateRoute><RecipeDetail /></PrivateRoute>} />
           <Route path="/add-recipe" element={<PrivateRoute><RecipeForm /></PrivateRoute>} />
